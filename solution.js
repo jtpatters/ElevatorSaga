@@ -57,7 +57,7 @@
 
             elevator.on("passing_floor", function(floorNum, direction) { 
                 console.log("e:"+index+" passing:"+floorNum+" q:"+elevator.destinationQueue);
-                if (elevator.loadFactor() > 0.7){
+                if (elevator.loadFactor() > 0.85){
                     console.log("e:"+index+" passing - too full");
                 }else if(floors[floorNum].buttonStates.down && direction == "down"){
                     goingDown(elevator,floors[floorNum],index);    
@@ -73,7 +73,7 @@
                 elevator.goingUpIndicator(true);
                 elevator.goingDownIndicator(true);
                 if (elevator.loadFactor()>0){
-                    console.log("e:"+index+" IS IDLE AND NOT EMPTY... STUCK!");
+                    console.log("e:"+index+" IS IDLE AND NOT EMPTY (l:"+elevator.loadFactor()+"... STUCK!");
                     elevator.goingUpIndicator(false);
                     elevator.goingDownIndicator(true);
                     elevator.goToFloor(0);       
@@ -84,16 +84,13 @@
                     for(var i=0; i<floors.length;i++){
                         if(floors[i].buttonStates.down || floors[i].buttonStates.up){
                             if(floors[i].enRoute){
-                                //console.log("REQUESTED FLOOR "+floors[i].floorNum()+" ALREADY HAS ELEVATOR ENROUTE");
                                 continue;
                             }
-                            if(current_date - floors[i].lastPress>2000){
-                                //console.log("Sending elevator to floor: "+floors[i].floorNum()+" based on wait time");
+                            if(current_date - floors[i].lastPress>3000){
                                 target=floors[i];
                                 break;
                             } 
                             var distance=Math.abs(elevator.currentFloor()-floors[i].floorNum());
-                            //console.log("Elevator: "+index+" distance calculated at: "+distance+" for floor:"+floors[i].floorNum());
                             if(distance<min_distance){
                                 min_distance=distance;
                                 target=floors[i];
