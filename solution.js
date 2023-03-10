@@ -9,7 +9,7 @@
             if(floor_index>-1){
                 var deleted = elevator.destinationQueue.splice(floor_index,1);
                 elevator.checkDestinationQueue();
-                console.log("called splice with index: "+floor_index);
+                //console.log("called splice with index: "+floor_index);
             }
             elevator.goToFloor(floor.floorNum(), true); 
             //console.log("e:"+index+" done prep unschedule stopping at:"+floor_num+" q:"+elevator.destinationQueue);
@@ -46,10 +46,11 @@
             elevator.on("stopped_at_floor", function(floorNum) {
                 floors[floorNum].enRoute=false;
                 //console.log("e:"+index+" stopping at:"+floorNum+" q:"+elevator.destinationQueue);
-                if (elevator.mode=="express"){
+                 if (elevator.mode=="express"){
                     elevator.goingUpIndicator(false);
                     elevator.goingDownIndicator(false);
-                }else if(floorNum==floors.length-1){
+                }else 
+                if(floorNum==floors.length-1){
                     elevator.goingUpIndicator(false);
                     elevator.goingDownIndicator(true);
                 } else if (floorNum == 0){
@@ -70,10 +71,10 @@
                 if (elevator.destinationQueue.indexOf(floorNum) != -1) { 
                     stopElevator(elevator,floors[floorNum],index);
                 }else if (elevator.mode=="express"){
-                    console.log("e:"+index+" in express mode :)");
-                }else if(elevator.loadFactor() > 0.75 || elevator.destinationQueue.length>2){
+                    //console.log("e:"+index+" in express mode :)");
+                }else if(elevator.loadFactor() > 0.93 || elevator.destinationQueue.length>4){
                     elevator.mode="express";
-                    console.log("e:"+index+" passing - too full or queue too long...");
+                    //console.log("e:"+index+" passing - too full or queue too long...");
                 }else if(floors[floorNum].buttonStates.down && direction == "down"){
                     goingDown(elevator,floors[floorNum],index);    
                 }else if(floors[floorNum].buttonStates.up && direction == "up"){
@@ -100,7 +101,7 @@
                     for(var i=0; i<floors.length;i++){
                         if(floors[i].buttonStates.down || floors[i].buttonStates.up){
                             if(floors[i].enRoute){
-                                continue;
+                               continue;
                             }
                             var wait=current_date - floors[i].lastPress;
                             if(wait>max_wait){
@@ -115,21 +116,24 @@
                         }
                     }
                     var target;
-                    console.log("max wait: "+max_wait+" min distance: "+min_distance);
-                    if(max_wait>1000){
+                    //console.log("max wait: "+max_wait+" min distance: "+min_distance);
+                    if(max_wait>700){
                         target=wait_target;
-                        console.log("Setting target based on wait. f:"+target.floorNum());
-                    } else if(min_distance==1){
+                        //console.log("Setting target based on wait. f:"+target.floorNum());
+                        target.enRoute=true;
+                        elevator.goToFloor(target.floorNum());
+
+                    } else if(min_distance<=2){
                         target=distance_target;
-                        console.log("Setting target based on distance. f:"+target.floorNum());
+                        //console.log("Setting target based on distance. f:"+target.floorNum());
+                        target.enRoute=true;
+                        elevator.goToFloor(target.floorNum());
+
                     } else {
-                        target=wait_target;
-                        console.log("Setting target based on wait. f:"+target.floorNum());
+                        floors[0].enRoute=true;
+                        elevator.goToFloor(floors[0].floorNum());
+                        
                     }
-
-                    target.enRoute=true;
-                    elevator.goToFloor(target.floorNum());
-
                 }
             });
         });
