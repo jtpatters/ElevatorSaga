@@ -25,11 +25,6 @@
 
         floors.forEach(function (floor) {
             floor.enRoute = false;
-
-            floor.on("up_button_pressed down_button_pressed", function() {
-                floor.lastPress = new Date();
-            });
-
         });       
 
         elevators.forEach(function(elevator, index) {
@@ -38,13 +33,13 @@
             }
             elevator.on("stopped_at_floor", function(floorNum) {
                 floors[floorNum].enRoute=false;
-                    if(floorNum==floors.length-1){
-                        elevator.goingUpIndicator(false);
-                        elevator.goingDownIndicator(true);
-                    } else if (floorNum == 0){
-                        elevator.goingUpIndicator(true);
-                        elevator.goingDownIndicator(false);
-                    }
+                if(floorNum==floors.length-1){
+                    elevator.goingUpIndicator(false);
+                    elevator.goingDownIndicator(true);
+                } else if (floorNum == 0){
+                    elevator.goingUpIndicator(true);
+                    elevator.goingDownIndicator(false);
+                }
             });
 
             elevator.on("floor_button_pressed", function(floorNum) {  
@@ -58,7 +53,7 @@
                     stopElevator(elevator,floors[floorNum],index);
                 }else if (elevator.mode=="express"){
                     //console.log("e:"+index+" in express mode :)");
-                }else if(elevator.loadFactor() > 0.88 ){ //|| elevator.destinationQueue.length>4){
+                }else if(elevator.loadFactor() > 0.85 ){ //|| elevator.destinationQueue.length>4){
                     elevator.mode="express";
                 }else if(floors[floorNum].buttonStates.down && direction == "down"){
                     goingDown(elevator,floors[floorNum],index);    
@@ -68,9 +63,9 @@
             });
 
             elevator.on("idle", function() {     
-               elevator.mode="normal";
-               request_floor_found=false;
-               for(var i=floors.length-1; i>=0;i--){
+                elevator.mode="normal";
+                request_floor_found=false;
+                for(var i=floors.length-1; i>=0;i--){
                     if(floors[i].buttonStates.down || floors[i].buttonStates.up){
                         if(floors[i].enRoute){
                             continue;
