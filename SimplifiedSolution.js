@@ -32,6 +32,8 @@
                 elevator.mode="normal";
             }
             elevator.on("stopped_at_floor", function(floorNum) {
+                console.log("e:"+index+" STOPPING "+elevator.maxPassengerCount()+" : "+elevator.loadFactor()+" : "+elevator.destinationQueue);
+
                 floors[floorNum].enRoute=false;
                 if(floorNum==floors.length-1){
                     elevator.goingUpIndicator(false);
@@ -49,20 +51,23 @@
             });
 
             elevator.on("passing_floor", function(floorNum, direction) { 
+                console.log("e:"+index+" PASSING "+elevator.maxPassengerCount()+" : "+elevator.loadFactor()+" : "+elevator.destinationQueue);
                 if (elevator.destinationQueue.indexOf(floorNum) != -1) { 
                     stopElevator(elevator,floors[floorNum],index);
                 }else if (elevator.mode=="express"|| floors[floorNum].enRoute){
                     //console.log("e:"+index+" in express mode :)");
-                }else if(elevator.loadFactor() > 0.8 ){ //|| elevator.destinationQueue.length>4){
+                }else if((elevator.maxPassengerCount() <5 && elevator.loadFactor() > 0.7)||(elevator.maxPassengerCount() >5 && elevator.loadFactor() > 0.81)){ //|| elevator.destinationQueue.length>4){
                     elevator.mode="express";
                 }else if(floors[floorNum].buttonStates.down && direction == "down"){
+                    //console.log("e: "+index+" stopping at floor: "+floorNum)
                     goingDown(elevator,floors[floorNum],index);    
                 }else if(floors[floorNum].buttonStates.up && direction == "up"){
                     goingUp(elevator,floors[floorNum],index);
                 }
             });
 
-            elevator.on("idle", function() {     
+            elevator.on("idle", function() { 
+                console.log("elevator idle "+index+" : "+elevator.loadFactor()+" : "+elevator.destinationQueue);
                 elevator.mode="normal";
                 request_floor_found=false;
                 for(var i=floors.length-1; i>=0;i--){
@@ -75,6 +80,7 @@
                         elevator.goingUpIndicator(true);
                         elevator.goingDownIndicator(true);
                         request_floor_found=true;
+                        break;
                     }
                 }
                 if(!request_floor_found){
