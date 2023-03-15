@@ -51,9 +51,9 @@
             elevator.on("passing_floor", function(floorNum, direction) { 
                 if (elevator.destinationQueue.indexOf(floorNum) != -1) { 
                     stopElevator(elevator,floors[floorNum],index);
-                }else if (elevator.mode=="express"){
+                }else if (elevator.mode=="express"|| floors[floorNum].enRoute){
                     //console.log("e:"+index+" in express mode :)");
-                }else if(elevator.loadFactor() > 0.85 ){ //|| elevator.destinationQueue.length>4){
+                }else if(elevator.loadFactor() > 0.8 ){ //|| elevator.destinationQueue.length>4){
                     elevator.mode="express";
                 }else if(floors[floorNum].buttonStates.down && direction == "down"){
                     goingDown(elevator,floors[floorNum],index);    
